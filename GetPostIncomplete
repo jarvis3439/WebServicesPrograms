@@ -1,0 +1,110 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package webservicedemo1;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author mca240
+ */
+
+class ConsumeData
+{
+    HttpURLConnection connection=null;
+    void createConnection(String method)throws Exception
+    {
+        URL url=new URL("https://reqres.in/api/users?per_page=10");
+        connection=(HttpURLConnection)url.openConnection();
+        
+        // Important propertiesto set
+        connection.setConnectTimeout(5000);
+        
+        // compulsory properties
+        connection.setRequestMethod(method);    // Default is GET
+        connection.setRequestProperty("User-Agent","Mozila/5.0");   // Device
+        connection.setRequestProperty("content-type","application/json; charset=UTF-8");    // Contenet type in JSON
+        connection.setRequestProperty("Accept", "application/json");    // only Accept JSON
+    }
+    
+    // Getting the Header info about Server(METADATA)
+    void getHeaderInformation()
+    {
+        Map<String,List<String>>headerFields=connection.getHeaderFields();
+        for (Map.Entry<String, List<String>> entry : headerFields.entrySet()) 
+        {
+            String key = entry.getKey();
+            List<String> value = entry.getValue();
+            System.out.println(key + " : "+ value);
+        }
+        // Accessing individual Header Information
+        System.out.println("connection type: "+connection.getRequestProperty("content-type"));
+    }
+    
+    void getData()throws IOException, JSONException
+    {
+        if(connection!=null)
+        {
+               connection.setDoOutput(true);
+            connection.connect();
+            
+            // send data
+            JSONObject userObj = new JSONObject();
+            userObj.put("name", "Xavier");
+            userObj.put("job", "Actor");
+            
+            OutputStream outputstream = connection.getOutputStream();
+            outputstream.write(userObj.toString().getBytes());
+            outputstream.close();
+            getHeaderInformation();
+            
+            // Reading the data
+            
+            if(connection.getResponseCode() == 200) {
+            Scanner scanner = new Scanner(connection.getInputStream(), "UTF-8");
+            String response = "";
+            while(scanner.hasNext()) {
+                response = response + scanner.next();
+            }
+                System.out.println(response);
+                // Parse JSON
+                JSONObject jo = new JSONObject(response);
+                JSONArray ja = jo.getJSONArray("data");
+                
+                for(int i =0; i < ja.length(); i++) {
+                    JSONObject userObj = ja.getJSONObject(i);
+                    String name = userObj.getString("first_name") + " " + userObj.getString("last_name");
+                    System.out.println(name);
+                }
+                
+        }
+          
+       }
+    }
+}
+public class WebServiceDemo1 {
+    public static void main(String[] args) throws Exception {
+        // TODO code application logic here
+        
+        ConsumeData cd=new ConsumeData();
+        // GET
+//        cd.createConnection("GET");
+//        cd.getData();
+        
+        // POST
+        cd.createConnection("POST");
+        cd.postData();
+    } 
+}
