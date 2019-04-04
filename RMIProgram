@@ -1,0 +1,87 @@
+RMIInterface.java
+---------------------
+
+package rmiprogram;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface RMIinterface extends Remote{
+    
+    String hello(String name) throws RemoteException;
+    
+}
+
+---------------------------------------------------------
+Hello.java
+---------------
+
+package rmiprogram;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class Hello extends UnicastRemoteObject implements RMIinterface {
+    Hello() throws RemoteException { }
+
+    @Override
+    public String hello(String name) throws RemoteException {
+        return "Hello" + name;
+    }
+    
+}
+----------------------------------------------------------
+RMIClient.java
+-----------------
+
+package rmiprogram;
+
+import java.rmi.Naming;
+import javax.swing.JOptionPane;
+
+public class RMIClient {
+    public static void main(String[] args) {
+        try
+        {
+            RMIinterface r=(RMIinterface)Naming.lookup("//localhost/MyServer");
+           System.out.println(r.hello("Chinaman"));
+            String text=JOptionPane.showInputDialog("Enter your name");
+            String response=r.hello(text);
+            JOptionPane.showMessageDialog(null, response);
+            
+        }catch(Exception w)
+        {
+            System.err.println(w.getMessage());
+            
+        }
+        
+    }
+}
+
+------------------------------------------------------------------
+RMIServer.java
+-------------------
+
+package rmiprogram;
+
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+
+public class RMIServer {
+    public static void main(String[] args) throws RemoteException {
+        Registry register=LocateRegistry.createRegistry(1099);
+        register.rebind("MyServer", new Hello());
+        System.out.println("Aapka swagat hai");
+        
+    }
+}
+-------------------------------------------------------------------------------------------
+
+
+1. First Run the Server with Right Click
+2. Run the Client using Right Click
+
+
+
