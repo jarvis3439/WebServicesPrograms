@@ -45,9 +45,18 @@ public class RMIClient {
         {
             RMIinterface r=(RMIinterface)Naming.lookup("//localhost/MyServer");
            System.out.println(r.hello("Chinaman"));
-            String text=JOptionPane.showInputDialog("Enter your name");
+            String text=JOptionPane.showInputDialog("Enter your name");     
             String response=r.hello(text);
             JOptionPane.showMessageDialog(null, response);
+            
+            /*  for farenhit to celcius
+            
+            String text=JOptionPane.showInputDialog("Enter temprature in farenhit :"); 
+            double farenhit = Double.parseDouble(text);
+            double celcius = ((farenhit - 32) * 1.8d);
+            String response=r.hello("Celcius :" +celcius);
+            JOptionPane.showMessageDialog(null, response);
+            */
             
         }catch(Exception w)
         {
